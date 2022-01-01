@@ -23,7 +23,8 @@
     function createGraph() {
         var container = {},
             startX,
-            maxId,
+            maxX = -10,
+            maxY = -1,
             me;
 
         me = {
@@ -37,10 +38,12 @@
                     y: y,
                     trunkId: trunkId
                 };
+                maxY = maxY < y ? y : maxY;
             },
 
             setEndX: function(id, x) {
                 container[id].endX = x - startX + 2;
+                maxX = maxX < x ? x : maxX;
             },
 
             setBranchStartX: function(id, x) {
@@ -62,6 +65,14 @@
 
             getY: function(id) {
                 return container[id].y * fontpx;
+            },
+
+            getMaxX: function(id) {
+                return maxX * fontpx;
+            },
+
+            getMaxY: function(id) {
+                return maxY * fontpx;
             },
 
             getTrunkId: function(id) {
@@ -562,12 +573,12 @@
 
         var i;
         var svg = createSvg();
-        var svgRoot = svg.createCanvas(500, 500);
+        var svgRoot = svg.createCanvas(graph.getMaxX() + 20, graph.getMaxY() + 20);
         for(i = 1; i <= quadroObject.id; i++) {
             svg.addLine(svgRoot, graph.getX(i), graph.getY(i), graph.getEndX(i), graph.getY(i), "black");
             if(typeof graph.getTrunkId(i) === "number") {
                 svg.addLine(svgRoot, graph.getBranchStartX(i), graph.getY(graph.getTrunkId(i)), graph.getX(i), graph.getY(i), "black");
-                if(typeof graph.getBranchEndX(i) === "number") {
+                if(!isNaN(graph.getBranchEndX(i))) {
                     svg.addLine(svgRoot, graph.getEndX(i), graph.getY(i), graph.getBranchEndX(i), graph.getY(graph.getTrunkId(i)), "black");
                 }
             }
@@ -579,6 +590,36 @@
         return svgRoot.toString();
     }
 
-    root["Branch"] = branch;
+    if(typeof module !== "undefined" && module.exports) {
+        module.exports = Rena;
+    } else {
+        var opt = {
+            scriptType: "text/x-branch-drawer"
+        };
+
+        function replaceChildNode(node, text) {
+            var result,
+                divNode;
+
+            result = branch(text);
+            divNode = document.createElement("div");
+            divNode.innerHTML = result;
+            node.parentNode.replaceChild(divNode, node);
+        }
+
+        document.addEventListener("DOMContentLoaded", function(e) {
+            var i,
+                scriptNodes;
+
+            scriptNodes = document.getElementsByTagName("script");
+            for(i = 0; i < scriptNodes.length;) {
+                if(scriptNodes[i].type === opt.scriptType) {
+                    replaceChildNode(scriptNodes[i], scriptNodes[i].text);
+                } else {
+                    i++;
+                }
+            }
+        });
+    }
 })(this);
 
