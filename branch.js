@@ -591,7 +591,7 @@
     }
 
     if(typeof module !== "undefined" && module.exports) {
-        module.exports = Rena;
+        module.exports = branch;
     } else {
         var opt = {
             scriptType: "text/x-branch-drawer"
