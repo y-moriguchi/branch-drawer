@@ -3,7 +3,9 @@
 This library draws source branch diagram of version control system like git by ASCII art.
 
 Example:
+
 input
+
 ```
 <script type="text/x-branch-drawer">
 
@@ -19,5 +21,6 @@ input
 ```
 
 output
+
 ![branch diagram](image/output1.svg)
 
